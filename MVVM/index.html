@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de tareas</title>
+</head>
+<body>
+  <h1>Lista de tareas</h1>
+  <ul id="task-list"></ul>
+  <input type="text" id="new-task-text">
+  <button id="add-task">Añadir tarea</button>
+  
+  <script>
+    class TaskListViewModel {
+      constructor() {
+        // Inicializar el modelo con algunas tareas
+        this.model = ['Comprar leche', 'Pagar la factura del teléfono', 'Hacer ejercicio'];
+        // Agregar una propiedad para mantener el texto de la nueva tarea
+        this.newTaskText = '';
+      }
+
+      getTasks() {
+        // Devolver una copia del modelo
+        return this.model.slice();
+      }
+
+      addTask() {
+        // Agregar la nueva tarea al modelo
+        this.model.push(this.newTaskText);
+        // Limpiar el texto de la nueva tarea
+        this.newTaskText = '';
+      }
+
+      completeTask(index) {
+        // Marcar la tarea como completada en el modelo
+        // En este ejemplo, simplemente eliminamos la tarea del modelo
+        this.model.splice(index, 1);
+      }
+    }
+
+    // Crear una instancia del modelo
+    const taskListViewModel = new TaskListViewModel();
+
+    // Obtener referencias a los elementos del DOM que vamos a utilizar
+    const taskList = document.getElementById('task-list');
+    const newTaskText = document.getElementById('new-task-text');
+    const addTaskButton = document.getElementById('add-task');
+
+    // Función para actualizar la lista de tareas en el DOM
+    function updateTaskList() {
+      // Obtener las tareas del modelo
+      const tasks = taskListViewModel.getTasks();
+      // Borrar la lista anterior de tareas
+      taskList.innerHTML = '';
+      // Crear una nueva lista de tareas
+      tasks.forEach((task, index) => {
+        const taskElement = document.createElement('li');
+        taskElement.innerHTML = `
+          <span>${task}</span>
+          <button class="complete-button">Completar</button>
+        `;
+        taskElement.querySelector('.complete-button').addEventListener('click', () => {
+          // Cuando se hace clic en el botón de completar, se marca la tarea como completada en el modelo
+          taskListViewModel.completeTask(index);
+          // Actualizar la lista de tareas en el DOM
+          updateTaskList();
+        });
+        taskList.appendChild(taskElement);
+      });
+    }
+
+    // Función para agregar una nueva tarea al modelo
+    function addTask() {
+      taskListViewModel.newTaskText = newTaskText.value;
+      taskListViewModel.addTask();
+      updateTaskList();
+    }
+
+    // Asignar manejadores de eventos
+    addTaskButton.addEventListener('click', addTask);
+
+    // Actualizar la lista de tareas en el DOM por primera vez
+    updateTaskList();
+  </script>
+</body>
+</html>
